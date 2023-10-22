@@ -1,0 +1,70 @@
+<coordinator-app name="${namespace}_coordinator_BACKUP_flow"
+                 frequency="${frequency}" start="${start_date}" end="${end_date}" timezone="${timezone}"
+                 xmlns="uri:oozie:coordinator:0.4" xmlns:sla="uri:oozie:sla:0.2">
+    <controls>
+        <timeout>1400</timeout>
+        <concurrency>1</concurrency>
+        <execution>LAST_ONLY</execution>
+    </controls>
+
+    <action>
+        <workflow>
+            <app-path>${projectRoot}/workflows/hbase-Backup-To-S3/Archive_To_S3</app-path>
+            <configuration>
+                <property>
+                    <name>oozie.use.system.libpath</name>
+                    <value>True</value>
+                </property>
+                <property>
+                    <name>start_date</name>
+                    <value>${start_date}</value>
+                </property>
+                <property>
+                    <name>end_date</name>
+                    <value>${end_date}</value>
+                </property>
+                <property>
+                    <name>nameNode</name>
+                    <value>${nameNode}</value>
+                </property>
+                <property>
+                    <name>jobTracker</name>
+                    <value>${jobTracker}</value>
+                </property>
+                <property>
+                    <name>projectRoot</name>
+                    <value>${projectRoot}</value>
+                </property>
+                <property>
+                    <name>namespace</name>
+                    <value>${namespace}</value>
+                </property>
+                <property>
+                    <name>zookeeperQuorum</name>
+                    <value>${zookeeperQuorum}</value>
+                </property>
+                <property>
+                    <name>recipientList</name>
+                    <value>${recipientList}</value>
+                </property>
+                <property>
+                    <name>retry_max_value</name>
+                    <value>${retry_max_value}</value>
+                </property>
+                <property>
+                    <name>retry_interval_value</name>
+                    <value>${retry_interval_value}</value>
+                </property>
+            </configuration>
+        </workflow>
+
+        <sla:info>
+            <sla:nominal-time>${coord:nominalTime()}</sla:nominal-time>
+            <sla:should-start>${1 * MINUTES}</sla:should-start>
+            <sla:should-end>${10 * HOURS}</sla:should-end>
+            <sla:alert-events>start_miss,end_miss</sla:alert-events>
+            <sla:alert-contact>${recipientList}</sla:alert-contact>
+        </sla:info>
+
+    </action>
+</coordinator-app>
